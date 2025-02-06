@@ -1,36 +1,42 @@
-const LAYOUT_PATH = "./views/layout.html";
-const layoutTemplate = await Deno.readTextFile(LAYOUT_PATH);
+// server.ts
+import { Handler } from "./routes/pagehandler.ts";
 
-// Hjälpfunktion för att rendera en sida med layout
-async function renderPage(title: string, contentPagePath: string): Promise<string> {
-  // Läs in innehållet för den specifika sidan
-  const content = await Deno.readTextFile(contentPagePath);
-  // Ersätt platshållare i layouten med faktiska värden
-  return layoutTemplate
-    .replace("{{title}}", title)
-    .replace("{{content}}", content)
-    .replace("{{year}}", new Date().getFullYear().toString());
+const routes: Record<string, string> = {
+  'notFound': '404',
+  '/': 'index'
 }
 
-// Starta HTTP-servern med Deno.serve
-Deno.serve(async (req) => {
-  const { pathname } = new URL(req.url);
+const handler = async (request: Request): Promise<Response> => {
+  const url = new URL(request.url);
+  const path: string = url.pathname;
 
-  let html: string;
+  console.log(`Request received for: ${path}`);
 
-  switch (pathname) {
-    case "/":
-      html = await renderPage("Hem", "./views/index.html");
-      break;
-    case "/about":
-      html = await renderPage("Om", "./views/about.html");
-      break;
-    default:
-      // En enkel 404-sida
-      return new Response("404 - Sidan hittades inte", { status: 404 });
+  if (routes[path]) {
+    return Handler(routes[path]);
   }
 
-  return new Response(html, {
-    headers: { "content-type": "text/html; charset=utf-8" },
-  });
-});
+  else if (path.startsWith("/public/")) {
+      try {
+          const file = await Deno.readFile("." + path);
+          const contentType = getContentType(path); 
+          return new Response(file, { headers: { "Content-Type": contentType } });
+      } catch {
+          return Handler(routes.notFound);
+      }
+  } else {
+    return Handler(routes.notFound);
+  }
+};
+
+function getContentType(path: string): string {
+    if (path.endsWith(".css")) return "text/css";
+    if (path.endsWith(".js")) return "text/javascript";
+    if (path.endsWith(".png")) return "image/png";
+    if (path.endsWith(".jpg") || path.endsWith(".jpeg")) return "image/jpeg";
+    if (path.endsWith(".gif")) return "image/gif";
+    if (path.endsWith(".svg")) return "image/svg+xml";
+    return "text/html; charset=utf-8"; // Default
+}
+
+Deno.serve(handler);

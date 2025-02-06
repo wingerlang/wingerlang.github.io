@@ -1,0 +1,80 @@
+// getValue_test.ts
+import { assert, assertEquals } from "https://deno.land/std@0.192.0/testing/asserts.ts";
+import { extractValuesInTemplate, flattenObject, getValue } from "./utils.ts";
+
+Deno.test("Får rätt värde för en enkel nyckel", () => {
+  const data = { age: 30 };
+  const result = getValue(data, "age");
+  assertEquals(result, "30");
+});
+
+Deno.test("Får rätt värde för en djupare egenskap", () => {
+  const data = {
+    me: {
+      firstName: "Kalle",
+      lastName: "Anka"
+    }
+  };
+  const result = getValue(data, "me.firstName");
+  assertEquals(result, "Kalle");
+});
+
+Deno.test("Returnerar tom sträng om nyckeln saknas", () => {
+  const data = {
+    me: {
+      firstName: "Kalle"
+    }
+  };
+  const result = getValue(data, "me.lastName");
+  assertEquals(result, "");
+});
+
+Deno.test("Returnerar tom sträng om den första nyckeln saknas", () => {
+  const data = { };
+  const result = getValue(data, "me.firstName");
+  assertEquals(result, "");
+});
+
+Deno.test("Returnerar korrekt värde även om det är ett tal", () => {
+  const data = { count: 0 };
+  const result = getValue(data, "count");
+  assertEquals(result, "0");
+});
+
+Deno.test("Returnerar en sträng även för objekt", () => {
+  const data = { obj: { a: 1 } };
+  const result = getValue(data, "obj");
+  // Notera att detta blir "[object Object]"
+  assertEquals(result, "[object Object]");
+});
+
+
+Deno.test('Should handle strings without any params', () => {
+   assertEquals('here is no params', extractValuesInTemplate('here is no params', {}));
+   assertEquals('here is no params {{', extractValuesInTemplate('here is no params {{', {}));
+   assertEquals('here is no params {{a', extractValuesInTemplate('here is no params {{a', {}));
+   assertEquals('here is no params {{ a}', extractValuesInTemplate('here is no params {{ a}', {}));
+});
+
+Deno.test('Should just print the var if no data is found', () => {
+   assertEquals('params without {{data}}', extractValuesInTemplate('params without {{data}}', {}));
+   assertEquals('params without {{ data}}', extractValuesInTemplate('params without {{ data}}', {}));
+   assertEquals('params without {{ data }}', extractValuesInTemplate('params without {{ data }}', {}));
+   assertEquals('params without {{  data}}', extractValuesInTemplate('params without {{  data}}', {}));
+});
+
+Deno.test('Should extract values if found in data (no depth)', () => {
+   assertEquals('params without 1', extractValuesInTemplate('params without {{data}}', {data: 1}));
+   assertEquals('params without 1', extractValuesInTemplate('params without {{ data}}', {data: '1'}));
+   assertEquals('params without 2', extractValuesInTemplate('params without {{ data }}', {data: 1+1}));
+});
+
+Deno.test('Should extract values if found in data (with depth)', () => {
+   assertEquals('My name is Johannes, I work at Consid', extractValuesInTemplate('My name is {{person.name}}, I work at {{ person.work}}', {person: {name: 'Johannes', work: 'Consid'}}));
+});
+
+Deno.test('flattenObject', () => {
+  assertEquals({'a': true}, flattenObject({a: true}))
+  assertEquals({'a.b': true, 'a.c': false}, flattenObject({a: {b: true, c: false}}))
+  assertEquals({'person.name': 'johannes', 'person.work': 'consid'}, flattenObject({person: {name: 'johannes', work: 'consid'}}))
+})
