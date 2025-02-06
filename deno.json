@@ -1,5 +1,8 @@
 {
+    "tasks": {
+        "server": "deno run -A --watch server.ts"
+    },
   "compilerOptions": {
-    "lib": ["dom", "esnext"]
+    "lib": ["dom", "esnext", "deno.ns"]
   }
 }
