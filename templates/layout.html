@@ -4,17 +4,53 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ pageTitle }}</title> <link rel="stylesheet" href="/public/style.css"> </head>
+    <script>
+        const getSourceCode = async () => {
+            const x = await fetch('/api/source');
+            const sourceCode = await x.text();
+            const bakgrundsTextDiv = document.querySelector('#background');
+            bakgrundsTextDiv.textContent = sourceCode;
+        }
+        getSourceCode();
+    </script>
+
 <body>
-    <header>
-        {{ headerContent }}
-    </header>
+    <div id="background"></div>
 
-    <main>
-        {{ mainContent }}
-    </main>
+    <header>{{ headerContent }}</header>
+    <main>{{ mainContent }}</main>
+    <footer>{{ footerContent }}</footer>
 
-    <footer>
-        {{ footerContent }}
-    </footer>
+    <style>
+        #background {
+        color: #777;
+        opacity: 0.3;
+        font-size: 2rem;
+        font-family: monospace;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        z-index: -1;
+        pointer-events: none;
+        user-select: none;
+        overflow: hidden;
+        line-height: 1.2;
+        white-space: pre-wrap; 
+    }
+
+     body {
+        font-family: Ubuntu, Geneva, Tahoma, sans-serif;
+        padding: 1rem;
+        background-color: #f9f9f9;
+    }
+
+    main, header {
+        padding: 0 1rem;
+        margin: 0;
+        background-color: papayawhip;
+    }
+    </style>
 </body>
 </html>

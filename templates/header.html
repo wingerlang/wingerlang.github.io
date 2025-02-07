@@ -1,13 +1,21 @@
+<script>
+    const getNav = () => {
+        const navs = fetch('/api/nav')
+            .then(response => response.json())
+            .then(data => {
+                const nav = document.querySelector('nav ul');
+                data.forEach(item => {
+                    console.log(item);
+                    const li = document.createElement('li');
+                    const a = document.createElement('a');
+                    a.href = item.path;
+                    a.innerText = item.title;
+                    li.appendChild(a);
+                    nav.appendChild(li);
+                });
+            });
+    }
+    getNav();
+</script>
 <h1>Johannes Winger-Lang</h1>
-<nav>
-    <ul>
-        <li><a href="/">Hem</a></li>
-        <li><a href="/blog">Blog</a></li>
-        <li><a href="/cv">CV</a></li>
-        <li><a href="/projects">Projekt</a></li>
-    </ul>
-</nav>
-
-<style>
-    
-</style>
+<nav><ul></ul></nav>

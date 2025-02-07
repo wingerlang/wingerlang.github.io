@@ -1,9 +1,6 @@
 import { extractValuesInTemplate } from "./utils.ts";
 
-export async function renderTemplate(
-  templatePath: string,
-  data: Record<string, string | number> = {}
-): Promise<string> {
+export async function renderTemplate( templatePath: string, data: Record<string, string | number> = {} ): Promise<string> {
   try {
     let templateContent = await Deno.readTextFile(templatePath);
 
@@ -15,19 +12,13 @@ export async function renderTemplate(
   }
 }
 
-// Ny funktion: renderPage
-export async function renderPage( mainContentTemplatePath: string, pageTitle: string, data: Record<string, string | number> = {}
-): Promise<Response> {
+export async function renderPage( mainContentTemplatePath: string, pageTitle: string, data: Record<string, string | number> = {}): Promise<Response> {
   const currentYear = new Date().getFullYear();
-
-  // Rendera header och footer (dessa är statiska för alla sidor just nu)
   const headerContent = await renderTemplate("./templates/header.html");
   const footerContent = await renderTemplate("./templates/footer.html", { currentYear });
 
-  // Rendera main content (unikt för varje sida, sökväg ges som argument)
-  const mainContent = await renderTemplate(mainContentTemplatePath, data); // Skicka med data till mainContent
-
-  // Rendera layouten och sätt in allt innehåll
+  console.log('data is', data);
+  const mainContent = await renderTemplate(mainContentTemplatePath, data);
   const htmlContent = await renderTemplate("./templates/layout.html", {
     pageTitle,
     headerContent,
