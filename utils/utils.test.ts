@@ -1,6 +1,6 @@
 // getValue_test.ts
 import { assert, assertEquals } from "https://deno.land/std@0.192.0/testing/asserts.ts";
-import { extractValuesInTemplate, flattenObject, getValue } from "./utils.ts";
+import { extractValuesInTemplate, flattenObject, getValue, handleLoops, removeWhiteSpace } from "./utils.ts";
 
 Deno.test("Får rätt värde för en enkel nyckel", () => {
   const data = { age: 30 };
@@ -77,4 +77,28 @@ Deno.test('flattenObject', () => {
   assertEquals({'a': true}, flattenObject({a: true}))
   assertEquals({'a.b': true, 'a.c': false}, flattenObject({a: {b: true, c: false}}))
   assertEquals({'person.name': 'johannes', 'person.work': 'consid'}, flattenObject({person: {name: 'johannes', work: 'consid'}}))
+})
+
+Deno.test('parse loop string', () => {
+    const template = `
+    <p> x.name1 </p>
+    <p> myList </p>
+    {{ foreach x in list }}
+    <h2> {{ x.name }} </h2>
+    <h2> {{ x.name }} </h2>
+    {{ /foreach }}`;
+
+  const expected = removeWhiteSpace(`
+    <p> x.name1 </p>
+    <p> myList </p>
+
+    <h2> list[0].name </h2>
+    <h2> list[0].name </h2>
+    <h2> list[1].name </h2>
+    <h2> list[1].name </h2>
+    `);
+
+  const data = { list: [{name: 'Johannes'}, {name: 'Kalle'}] };
+  const result = handleLoops(template, data);
+  assertEquals(result, expected);
 })

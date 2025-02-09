@@ -27,6 +27,36 @@ export function flattenObject(obj: any, prefix = '', result = {}) {
   return result;
 }
 
+export const handleLoops = (template: string, data: any) => {
+    const loopsRegExp = new RegExp(/{{\s*foreach\s*(.*?)\s*in\s*(.*?)\s*}}(.*?){{\s*\/foreach\s*}}/, 'mis');
+    let processedTemplate = template;
+    let match;
+
+    while ((match = processedTemplate.match(loopsRegExp))) {
+        const [fullMatch, iterator, listName, content] = match;
+
+        let generatedHTML = '';
+        if (data[listName]) {
+            const list = data[listName];
+            for (const item of list) {
+                let itemHTML = content;
+                const innerRegExp = new RegExp(`{{\\s*${iterator}\\.(\\w+)\\s*}}`, 's');
+                let innerMatch;
+                while ((innerMatch = itemHTML.match(innerRegExp))) {
+                    const placeholder = innerMatch[0];
+                    const propertyName = innerMatch[1];
+                    //const value = item[propertyName]; // This is the original code
+                    const value = `${listName}[${list.indexOf(item)}].${propertyName}`;
+                    itemHTML = itemHTML.replace(placeholder, value !== undefined ? value : '');
+                }
+                generatedHTML += itemHTML;
+            }
+        }
+        processedTemplate = processedTemplate.replace(fullMatch, generatedHTML);
+    }
+    return removeWhiteSpace(processedTemplate);
+};
+
 export const extractValuesInTemplate = (template: string, data: any) => {
   const flatData: Record<string, string> = flattenObject(data);
   for (const key in flatData) {
@@ -51,3 +81,5 @@ export const ContentType: Record<string, string> = {
   'svg': 'image/svg+xml',
   'html': 'text/html; charset=utf-8'
 }
+
+export const removeWhiteSpace = (s:string): string => s.replace(/\s+/g, ' ').trim();
