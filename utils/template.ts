@@ -1,9 +1,10 @@
-import { extractValuesInTemplate } from "./utils.ts";
+import { extractValuesInTemplate, handleLoops } from "./utils.ts";
 
 export async function renderTemplate( templatePath: string, data: Record<string, string | number> = {} ): Promise<string> {
   try {
     let templateContent = await Deno.readTextFile(templatePath);
 
+    templateContent = handleLoops(templateContent, data);
     templateContent = extractValuesInTemplate(templateContent, data);
     return templateContent;
   } catch (e) {
@@ -17,7 +18,6 @@ export async function renderPage( mainContentTemplatePath: string, pageTitle: st
   const headerContent = await renderTemplate("./templates/header.html");
   const footerContent = await renderTemplate("./templates/footer.html", { currentYear });
 
-  console.log('data is', data);
   const mainContent = await renderTemplate(mainContentTemplatePath, data);
   const htmlContent = await renderTemplate("./templates/layout.html", {
     pageTitle,

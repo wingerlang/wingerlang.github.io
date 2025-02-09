@@ -5,12 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ pageTitle }}</title> <link rel="stylesheet" href="/public/style.css"> </head>
     <script>
-        const getSourceCode = async () => {
+        async function getSourceCode () {
             const x = await fetch('/api/source');
             const sourceCode = await x.text();
+            console.log(sourceCode);
             const bakgrundsTextDiv = document.querySelector('#background');
             bakgrundsTextDiv.textContent = sourceCode;
-        }
+        };
         getSourceCode();
     </script>
 

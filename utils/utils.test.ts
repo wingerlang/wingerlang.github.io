@@ -73,10 +73,21 @@ Deno.test('Should extract values if found in data (with depth)', () => {
    assertEquals('My name is Johannes, I work at Consid', extractValuesInTemplate('My name is {{person.name}}, I work at {{ person.work}}', {person: {name: 'Johannes', work: 'Consid'}}));
 });
 
+Deno.test('flatten objects paths with objects', () => {
+  assertEquals({'a': true}, flattenObject({a: true}))
+  assertEquals({'a.b': true, 'a.c': false}, flattenObject({a: {b: true, c: false}}))
+  assertEquals({'person.name': 'johannes', 'person.work': 'consid'}, flattenObject({person: {name: 'johannes', work: 'consid'}}))
+})
+
 Deno.test('flattenObject', () => {
   assertEquals({'a': true}, flattenObject({a: true}))
   assertEquals({'a.b': true, 'a.c': false}, flattenObject({a: {b: true, c: false}}))
   assertEquals({'person.name': 'johannes', 'person.work': 'consid'}, flattenObject({person: {name: 'johannes', work: 'consid'}}))
+})
+
+Deno.test('flattenObjectWithArray', () => {
+  assertEquals({'items[0].name': 'hi there'}, flattenObject({items: [{name: 'hi there'}]}))
+  assertEquals({'a.b': true, 'a.c[0]': false, 'a.c[1]': true}, flattenObject({a: {b: true, c: [false, true]}}))
 })
 
 Deno.test('parse loop string', () => {
@@ -92,13 +103,13 @@ Deno.test('parse loop string', () => {
     <p> x.name1 </p>
     <p> myList </p>
 
-    <h2> list[0].name </h2>
-    <h2> list[0].name </h2>
-    <h2> list[1].name </h2>
-    <h2> list[1].name </h2>
+    <h2> {{ list[0].name }} </h2>
+    <h2> {{ list[0].name }} </h2>
+    <h2> {{ list[1].name }} </h2>
+    <h2> {{ list[1].name }} </h2>
     `);
 
-  const data = { list: [{name: 'Johannes'}, {name: 'Kalle'}] };
+  const data = { list: [{name: 'Johannes'}, {name: 'Gustav'}] };
   const result = handleLoops(template, data);
   assertEquals(result, expected);
 })

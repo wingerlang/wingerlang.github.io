@@ -1,5 +1,5 @@
 <script>
-    const getNav = () => {
+    async function getNav() {
         const navs = fetch('/api/nav')
             .then(response => response.json())
             .then(data => {
@@ -15,7 +15,7 @@
                 });
             });
     }
-    getNav();
+   getNav();
 </script>
 <h1>Johannes Winger-Lang</h1>
 <nav><ul></ul></nav>

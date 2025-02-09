@@ -17,7 +17,16 @@ export function flattenObject(obj: any, prefix = '', result = {}) {
       const value = obj[key];
       const newKey = prefix ? `${prefix}.${key}` : key;
 
-      if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
+      if (Array.isArray(value)) {
+        value.forEach((arrayValue, index) => {
+          const arrayKey = `${newKey}[${index}]`;
+          if (typeof arrayValue === 'object' && arrayValue !== null) {
+            flattenObject(arrayValue, arrayKey, result);
+          } else {
+            result[arrayKey] = arrayValue;
+          }
+        });
+      } else if (typeof value === 'object' && value !== null) {
         flattenObject(value, newKey, result);
       } else {
         result[newKey] = value;
@@ -46,7 +55,7 @@ export const handleLoops = (template: string, data: any) => {
                     const placeholder = innerMatch[0];
                     const propertyName = innerMatch[1];
                     //const value = item[propertyName]; // This is the original code
-                    const value = `${listName}[${list.indexOf(item)}].${propertyName}`;
+                    const value = `{{ ${listName}[${list.indexOf(item)}].${propertyName} }}`;
                     itemHTML = itemHTML.replace(placeholder, value !== undefined ? value : '');
                 }
                 generatedHTML += itemHTML;
@@ -59,11 +68,12 @@ export const handleLoops = (template: string, data: any) => {
 
 export const extractValuesInTemplate = (template: string, data: any) => {
   const flatData: Record<string, string> = flattenObject(data);
+
   for (const key in flatData) {
-      const placeholder = `{{\\s*${key}\\s*}}`;
+      const placeholder = `{{\\s*${escapeRegExp(key)}\\s*}}`;
       const regex = new RegExp(placeholder, 'ig');
       const value = String(flatData[key]);
-      template = template.replace(regex, value);
+      template = template.replaceAll(regex, value);
     }
     return template;
 }
@@ -83,3 +93,7 @@ export const ContentType: Record<string, string> = {
 }
 
 export const removeWhiteSpace = (s:string): string => s.replace(/\s+/g, ' ').trim();
+
+function escapeRegExp(str: string): string {
+  return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}

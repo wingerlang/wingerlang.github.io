@@ -10,7 +10,8 @@ interface Nav {
 const routes: Record<string, Nav> = {
   'notFound': {path: '404', nav: false},
   '/': {title: 'home', path: 'index'},
-  '/cv': {title: 'CV'}
+  '/cv': {title: 'CV'},
+  '/path-to-ai': {title: 'Path to AI '}
 }
 
 const api: Record<string, any> = {
