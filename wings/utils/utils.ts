@@ -107,3 +107,19 @@ export const removeWhiteSpace = (s: string): string =>
 function escapeRegExp(str: string): string {
   return str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
+
+export const isObject = (value: any): boolean => {
+  return value !== null && typeof value === "object";
+};
+export const isFunction = (value: any): boolean => {
+  return typeof value === "function";
+};
+export const isUndefinedOrNull = (value: any): boolean => {
+  return value === undefined || value === null;
+};
+export const isString = (value: any): boolean => {
+  return typeof value === "string";
+};
+export const getJsonHeaders = () => {
+  return { "Content-Type": "application/json" };
+};

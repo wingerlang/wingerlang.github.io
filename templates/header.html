@@ -1,15 +1,18 @@
 <script>
   async function getNav() {
-    const navs = fetch("/api/nav")
+    const navs = fetch("/api/routes")
       .then((response) => response.json())
       .then((data) => {
         const nav = document.querySelector("nav ul");
-        data.forEach((item) => {
-          console.log(item);
+        Object.keys(data).forEach(key => {
+          const item = data[key];
+          if (item.navbar === false) {
+            return;
+          }
           const li = document.createElement("li");
           const a = document.createElement("a");
           a.href = item.path;
-          a.innerText = item.title;
+          a.innerText = item?.controller?.meta?.title || item.path;
           li.appendChild(a);
           nav.appendChild(li);
         });

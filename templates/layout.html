@@ -10,7 +10,6 @@
     async function getSourceCode() {
       const x = await fetch("/api/source");
       const sourceCode = await x.text();
-      console.log(sourceCode);
       const bakgrundsTextDiv = document.querySelector("#background");
       bakgrundsTextDiv.textContent = sourceCode;
     }

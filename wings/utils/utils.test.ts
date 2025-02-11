@@ -1,6 +1,4 @@
-// getValue_test.ts
 import {
-  assert,
   assertEquals,
 } from "https://deno.land/std@0.192.0/testing/asserts.ts";
 import {

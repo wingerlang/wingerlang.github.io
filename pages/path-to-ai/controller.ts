@@ -9,7 +9,12 @@ const books = [
   { title: "Deep Learning" },
 ];
 
-export const data = {
-  courses,
-  books,
+export const controller = {
+  meta: {
+    navbar: true,
+  },
+  data: {
+    courses,
+    books,
+  }
 };
